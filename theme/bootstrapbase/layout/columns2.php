@@ -60,6 +60,7 @@ echo $OUTPUT->doctype() ?>
 <div id="page" class="container-fluid">
     <?php echo $OUTPUT->full_header(); ?>
     <div id="page-content" class="row-fluid">
+	<?php echo $OUTPUT->blocks('side-pre', $sidepre); ?>
         <section id="region-main" class="<?php echo $regionmain; ?>">
             <?php
             echo $OUTPUT->course_content_header();
@@ -67,7 +68,6 @@ echo $OUTPUT->doctype() ?>
             echo $OUTPUT->course_content_footer();
             ?>
         </section>
-        <?php echo $OUTPUT->blocks('side-pre', $sidepre); ?>
     </div>
 
     <footer id="page-footer">
