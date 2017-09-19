@@ -105,6 +105,11 @@ class HTML_QuickForm_Renderer_Tableless extends HTML_QuickForm_Renderer_Default
     */
    var $_fieldsetsOpen = 0;
 
+   // have to create "fake" fieldsets (div blocs) instead of fieldset with class hidden regarding the accessibility issue
+   var $_fakeFieldsetOpen = 0;
+   var $_fakeFieldsetOpenTemplate = "\n\t<div>";
+   var $_fakeFieldsetCloseTemplate = "\n\t</div>";
+
    /**
     * Array of element names that indicate the end of a fieldset
     * (a new one will be opened when a the next header element occurs)
@@ -172,6 +177,12 @@ class HTML_QuickForm_Renderer_Tableless extends HTML_QuickForm_Renderer_Default
     */
     function renderElement(&$element, $required, $error)
     {
+        // test to see if any fakefieldset open -> so we can close it here
+        if($this->_fakeFieldsetOpen > 0) {
+            $this->_html .= $this->_fakeFieldsetCloseTemplate;
+            $this->_fakeFieldsetOpen--;
+        }
+
         // if the element name indicates the end of a fieldset, close the fieldset
         if (   in_array($element->getName(), $this->_stopFieldsetElements)
             && $this->_fieldsetsOpen > 0
@@ -182,8 +193,9 @@ class HTML_QuickForm_Renderer_Tableless extends HTML_QuickForm_Renderer_Default
         // if no fieldset was opened, we need to open a hidden one here to get
         // XHTML validity
         if ($this->_fieldsetsOpen === 0) {
-            $this->_html .= $this->_openHiddenFieldsetTemplate;
-            $this->_fieldsetsOpen++;
+            // instead of using openHiddenFieldset, we use <div> regarding the accessibility issue
+            $this->_html .= $this->_fakeFieldsetOpenTemplate;
+            $this->_fakeFieldsetOpen++;
         }
         if (!$this->_inGroup) {
             $html = $this->_prepareTemplate($element->getName(), $element->getLabel(), $required, $error);
