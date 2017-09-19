@@ -1343,10 +1343,10 @@ class flexible_table {
      * @return string HTML fragment.
      */
     protected function sort_link($text, $column, $isprimary, $order) {
+	$sort_by = get_string('sortby') . ' ' . $text . ' (' . $this->sort_order_name($isprimary,$order) .')';
         return html_writer::link($this->baseurl->out(false,
                 array($this->request[TABLE_VAR_SORT] => $column)),
-                $text . get_accesshide(get_string('sortby') . ' ' .
-                $text . ' ' . $this->sort_order_name($isprimary, $order))) . ' ' .
+                $text . get_accesshide($sort_by),['title'=>$sort_by]) . ' ' .
                 $this->sort_icon($isprimary, $order);
     }
 
