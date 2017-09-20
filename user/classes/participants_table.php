@@ -217,6 +217,7 @@ class participants_table extends \table_sql {
         }
 
         $this->set_attribute('id', 'participants');
+	$this->set_attribute('role', 'presentation');
 
         // Set the variables we need to use later.
         $this->currentgroup = $currentgroup;
