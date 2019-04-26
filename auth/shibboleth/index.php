@@ -75,6 +75,18 @@
                 }
             }
 
+            // link shibboleth spid to session sid
+            $shibboleth_session = new stdClass();
+            $shibboleth_session->userid = $user->id;
+            $shibboleth_session->shibboleth_id = $SESSION->shibboleth_session_id;
+            $shibboleth_session->session_id = session_id();
+            $param_shibboleth_id = ['shibboleth_id' => $shibboleth_session->shibboleth_id];
+            if($DB->record_exists('shibboleth_session', $param_shibboleth_id)) {
+                // in case user was disconnected from moodle but still connected to idp
+                $DB->delete_records('shibboleth_session', $param_shibboleth_id);
+            }
+            $DB->insert_record('shibboleth_session', $shibboleth_session, false);
+
             redirect($urltogo);
 
             exit;

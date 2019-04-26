@@ -127,14 +127,22 @@ WSDL;
  * @return SoapFault or void if everything was fine
  */
 function LogoutNotification($spsessionid) {
-    $sessionclass = \core\session\manager::get_handler_class();
-    switch ($sessionclass) {
-        case '\core\session\file':
-            return \auth_shibboleth\helper::logout_file_session($spsessionid);
-        case '\core\session\database':
-            return \auth_shibboleth\helper::logout_db_session($spsessionid);
-        default:
-            throw new moodle_exception("Shibboleth logout not implemented for '$sessionclass'");
+    global $DB;
+
+    if ($DB->record_exists('shibboleth_session', ['shibboleth_id' => $spsessionid])) {
+        $shibboleth_session = $DB->get_record('shibboleth_session', ['shibboleth_id' => $spsessionid]);
+        \core\session\manager::kill_session($shibboleth_session->session_id);
+        $DB->delete_records('shibboleth_session', ['shibboleth_id' => $spsessionid]);
     }
+
+//    $sessionclass = \core\session\manager::get_handler_class();
+//    switch ($sessionclass) {
+//        case '\core\session\file':
+//            return \auth_shibboleth\helper::logout_file_session($spsessionid);
+//        case '\core\session\database':
+//            return \auth_shibboleth\helper::logout_db_session($spsessionid);
+//        default:
+//            throw new moodle_exception("Shibboleth logout not implemented for '$sessionclass'");
+//    }
     // If no SoapFault was thrown, the function will return OK as the SP assumes.
 }

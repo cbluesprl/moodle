@@ -51,5 +51,20 @@ function xmldb_auth_shibboleth_upgrade($oldversion) {
     // Automatically generated Moodle v3.6.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2019042600) {
+        $table = new xmldb_table('shibboleth_session');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('shibboleth_id', XMLDB_TYPE_CHAR, 200, null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('session_id', XMLDB_TYPE_CHAR, 200, null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+
+        upgrade_plugin_savepoint(true, 2019042600, 'auth', 'shibboleth');
+    }
+
     return true;
 }
