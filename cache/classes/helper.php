@@ -739,13 +739,18 @@ class cache_helper {
                 }
                 // Get all of the keys.
                 $keys = $store->find_by_prefix(cache_session::KEY_PREFIX);
-                $todelete = array();
-                foreach ($store->get_many($keys) as $key => $value) {
-                    if (strpos($key, cache_session::KEY_PREFIX) !== 0 || !is_array($value) || !isset($value['lastaccess'])) {
-                        continue;
-                    }
-                    if ((int)$value['lastaccess'] < $purgetime || true) {
-                        $todelete[] = $key;
+                if (count($keys) > 0) {
+                    $todelete = array();
+                    $values = $store->get_many($keys);
+                    if (count($values) > 0) {
+                        foreach ($store->get_many($keys) as $key => $value) {
+                            if (strpos($key, cache_session::KEY_PREFIX) !== 0 || !is_array($value) || !isset($value['lastaccess'])) {
+                                continue;
+                            }
+                            if ((int)$value['lastaccess'] < $purgetime || true) {
+                                $todelete[] = $key;
+                            }
+                        }
                     }
                 }
                 if (count($todelete)) {
