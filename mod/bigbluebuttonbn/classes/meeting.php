@@ -359,6 +359,8 @@ class meeting {
      * @return array
      */
     protected function create_meeting_data() {
+		global $CFG;
+
         $data = ['meetingID' => $this->instance->get_meeting_id(),
             'name' => \mod_bigbluebuttonbn\plugin::html2text($this->instance->get_meeting_name(), 64),
             'attendeePW' => $this->instance->get_viewer_password(),
@@ -386,6 +388,12 @@ class meeting {
         if ($this->instance->get_mute_on_start()) {
             $data['muteOnStart'] = 'true';
         }
+		// Check if analytics_callback_url is filled
+		if (!empty($CFG->bigbluebuttonbn_analytics_callback_url)) {
+			$data['meetingKeepEvents'] = 'true';
+			$data['meta_analytics-callback-url'] = $CFG->bigbluebuttonbn_analytics_callback_url;
+		}
+
         // Locks settings.
         foreach (self::LOCK_SETTINGS_MEETING_DATA as $instancevarname => $lockname) {
             $instancevar = $this->instance->get_instance_var($instancevarname);

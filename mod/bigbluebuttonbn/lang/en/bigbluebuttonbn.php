@@ -236,6 +236,8 @@ $string['config_recordingready_enabled'] = 'Send recording available notificatio
 $string['config_recordingready_enabled_description'] = 'If enabled, a notification will be sent when a recording link is available. This feature requires the script post_publish_recording_ready_callback to be enabled on the BigBlueButton server.';
 $string['config_meetingevents_enabled'] = 'Register live sessions';
 $string['config_meetingevents_enabled_description'] = 'If enabled, live sessions will be processed after the session ends. This feature is required for Activity completion and will only work if the BigBlueButton server is capable of processing post_events scripts.';
+$string['config_analytics_callback_url'] = 'URL to Analytics Callback';
+$string['config_analytics_callback_url_description'] = 'If a URL is entered, at the end of each live session, a web service call will be made on this URL with statistics parameters in POST';
 
 $string['config_warning_curl_not_installed'] = 'This feature requires the CURL extension for php installed and enabled. The settings will be accessible only if this condition is fulfilled.';
 $string['config_warning_bigbluebuttonbn_cfg_deprecated'] = 'BigBlueButton makes use of config.php with a global variable that has been deprecated. Please convert the file as it will not be supported in future versions.';

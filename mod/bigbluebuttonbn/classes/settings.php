@@ -895,6 +895,19 @@ class settings {
                 $item,
                 $experimentalfeaturessetting
             );
+			// URL for 'analytics callback' feature.
+			$item = new admin_setting_configtext(
+				'bigbluebuttonbn_analytics_callback_url',
+				get_string('config_analytics_callback_url', 'bigbluebuttonbn'),
+				get_string('config_analytics_callback_url_description', 'bigbluebuttonbn'),
+				'',
+				PARAM_RAW
+			);
+			$this->add_conditional_element(
+				'meetingevents_enabled',
+				$item,
+				$experimentalfeaturessetting
+			);
         }
         $this->admin->add($this->parent, $experimentalfeaturessetting);
     }
