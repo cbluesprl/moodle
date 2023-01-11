@@ -765,7 +765,7 @@ class cache_helper {
                     if (strpos($key, cache_session::KEY_PREFIX) !== 0 || !is_array($value) || !isset($value['lastaccess'])) {
                         continue;
                     }
-                    if ((int)$value['lastaccess'] < $purgetime || true) {
+                    if ((int)$value['lastaccess'] < $purgetime) {
                         $todelete[] = $key;
                     }
                 }
