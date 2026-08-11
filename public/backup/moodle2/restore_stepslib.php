@@ -6267,6 +6267,8 @@ trait restore_questions_attempt_data_trait {
     protected $qtypes = array();
     /** @var array question_attempt->id to questionid. */
     protected $newquestionids = array();
+    /** @var array restore_qtype_plugin instances, keyed by qtype. */
+    protected $qtypeplugins = [];
 
     /**
      * Attach below $element (usually attempts) the needed restore_path_elements
@@ -6490,20 +6492,15 @@ trait restore_questions_attempt_data_trait {
      * @return restore_qtype_plugin instance.
      */
     protected function get_qtype_restorer($qtype) {
-        // Build one static cache to store {@link restore_qtype_plugin}
-        // while we are needing them, just to save zillions of instantiations
-        // or using static stuff that will break our nice API
-        static $qtypeplugins = array();
-
-        if (!isset($qtypeplugins[$qtype])) {
+        if (!isset($this->qtypeplugins[$qtype])) {
             $classname = 'restore_qtype_' . $qtype . '_plugin';
             if (class_exists($classname)) {
-                $qtypeplugins[$qtype] = new $classname('qtype', $qtype, $this);
+                $this->qtypeplugins[$qtype] = new $classname('qtype', $qtype, $this);
             } else {
-                $qtypeplugins[$qtype] = null;
+                $this->qtypeplugins[$qtype] = null;
             }
         }
-        return $qtypeplugins[$qtype];
+        return $this->qtypeplugins[$qtype];
     }
 
     protected function after_execute() {
