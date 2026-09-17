@@ -1876,4 +1876,46 @@ final class enrollib_test extends advanced_testcase {
         $message = reset($messages);
         $this->assertStringContainsString('Hi ' . $student->firstname, quoted_printable_decode($message->fullmessage));
     }
+
+    /**
+     * Test enrol_user_delete() when the user holds an enrolment in a course that no longer exists.
+     *
+     * Such orphaned enrolments can be left behind when a course is deleted while an enrolment
+     * synchronisation is running (MDL-89837). They must not prevent the user from being deleted.
+     *
+     * @covers ::enrol_user_delete
+     * @covers \enrol_plugin::user_delete
+     */
+    public function test_enrol_user_delete_with_orphaned_enrolment(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
+
+        // A regular course, to make sure the normal unenrolment still happens.
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
+        $manualinstance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', MUST_EXIST);
+
+        // A course whose record and context are gone while its enrolment instance and user enrolment remain.
+        $deletedcourse = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($user->id, $deletedcourse->id, $studentrole->id);
+        $orphanedinstance = $DB->get_record('enrol', ['courseid' => $deletedcourse->id, 'enrol' => 'manual'], '*',
+            MUST_EXIST);
+        context_helper::delete_instance(CONTEXT_COURSE, $deletedcourse->id);
+        $DB->delete_records('course', ['id' => $deletedcourse->id]);
+        $this->assertTrue($DB->record_exists('user_enrolments', ['enrolid' => $orphanedinstance->id, 'userid' => $user->id]));
+
+        enrol_user_delete($user);
+
+        // Both the regular and the orphaned enrolments are gone.
+        $this->assertFalse($DB->record_exists('user_enrolments', ['userid' => $user->id]));
+        $this->assertFalse($DB->record_exists('role_assignments', ['userid' => $user->id, 'contextid' => $coursecontext->id]));
+
+        // The enrolment instance of the regular course is untouched.
+        $this->assertTrue($DB->record_exists('enrol', ['id' => $manualinstance->id]));
+    }
 }

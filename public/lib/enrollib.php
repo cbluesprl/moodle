@@ -2895,9 +2895,13 @@ abstract class enrol_plugin {
     public function user_delete($user) {
         global $DB;
 
+        // Skip enrolments in courses that no longer exist: there is nothing to unenrol from and
+        // unenrol_user() would fail trying to load the course context. The orphaned user_enrolments
+        // records are removed by the final cleanup in enrol_user_delete().
         $sql = "SELECT e.*
                   FROM {enrol} e
                   JOIN {user_enrolments} ue ON (ue.enrolid = e.id)
+                  JOIN {course} c ON (c.id = e.courseid)
                  WHERE e.enrol = :name AND ue.userid = :userid";
         $params = array('name'=>$this->get_name(), 'userid'=>$user->id);
 
