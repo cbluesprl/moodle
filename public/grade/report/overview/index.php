@@ -27,6 +27,8 @@ require_once $CFG->libdir.'/gradelib.php';
 require_once $CFG->dirroot.'/grade/lib.php';
 require_once $CFG->dirroot.'/grade/report/overview/lib.php';
 
+require_login(null, false);
+
 $courseid = optional_param('id', SITEID, PARAM_INT);
 $userid   = optional_param('userid', $USER->id, PARAM_INT);
 
@@ -35,7 +37,6 @@ $PAGE->set_url(new moodle_url('/grade/report/overview/index.php', array('id' => 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     throw new \moodle_exception('invalidcourseid');
 }
-require_login(null, false);
 $PAGE->set_course($course);
 
 $context = context_course::instance($course->id);
